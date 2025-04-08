@@ -1,4 +1,5 @@
 import csv
+import time
 
 def write_to_csv(file_path, device_id, timestamp, power_consumption):
     try:
@@ -7,3 +8,5 @@ def write_to_csv(file_path, device_id, timestamp, power_consumption):
             writer.writerow([device_id, timestamp, power_consumption])
     except IOError as e:
         print(f"CSV write error: {e}")
+        time.sleep(5)  # Retry after a delay
+        write_to_csv(file_path, device_id, timestamp, power_consumption)

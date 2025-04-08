@@ -1,7 +1,7 @@
 import threading
 from database.db_setup import setup_database
 from csv_handler.csv_setup import setup_csv
-from sensors.simulator import simulate_sensor_data
+from sensors.simulator import simulate_sensor_data, simulate_energy_generation
 from gui.app import setup_gui
 
 def main():
@@ -9,12 +9,19 @@ def main():
     csv_file = 'energy_usage.csv'
     setup_csv(csv_file)
 
-    # Start simulation in separate threads
-    devices = ["device_1", "device_2", "device_3"]
+    # Start simulation for appliances
+    devices = ["TV", "Fan", "Air Conditioner"]
     threads = []
 
     for device_id in devices:
         thread = threading.Thread(target=simulate_sensor_data, args=(device_id, csv_file))
+        threads.append(thread)
+        thread.start()
+
+    # Start simulation for energy sources
+    energy_sources = ["solar", "wind turbine", "storage battery", "grid"]
+    for energy_source in energy_sources:
+        thread = threading.Thread(target=simulate_energy_generation, args=(energy_source,))
         threads.append(thread)
         thread.start()
 
