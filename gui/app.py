@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 from database.db_operations import query_real_time, view_statistics, view_total_energy_generation, compare_energy_source_efficiency, alert_low_generation
 
 def setup_gui():
+    # Setup GUI for user interaction
     def query_device_consumption():
         device_id = device_id_var.get()
         data = query_real_time(device_id=device_id)

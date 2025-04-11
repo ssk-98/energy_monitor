@@ -5,6 +5,7 @@ from sensors.simulator import simulate_sensor_data, simulate_energy_generation
 from gui.app import setup_gui
 
 def main():
+    # Setup database and CSV file
     setup_database()
     csv_file = 'energy_usage.csv'
     setup_csv(csv_file)
@@ -21,7 +22,7 @@ def main():
     # Start simulation for energy sources
     energy_sources = ["solar", "wind turbine", "storage battery", "grid"]
     for energy_source in energy_sources:
-        thread = threading.Thread(target=simulate_energy_generation, args=(energy_source,))
+        thread = threading.Thread(target=simulate_energy_generation, args=(energy_source, csv_file))
         threads.append(thread)
         thread.start()
 

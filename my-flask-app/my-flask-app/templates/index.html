@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Power Dashboard</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
+    h1, h2 { text-align: center; }
+    .btn-container { text-align: center; margin-bottom: 20px; }
+    .btn-group { margin: 10px auto; display: inline-block; }
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    .stats {
+      background: white;
+      padding: 20px;
+      max-width: 600px;
+      margin: 20px auto;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .stats p { margin: 10px 0; font-size: 1.1em; }
+  </style>
+</head>
+<body>
+
+<h1>🔋 Power Monitoring Dashboard</h1>
+
+<div class="btn-container">
+  <h2>Devices</h2>
+  <div class="btn-group" id="device-list">Loading devices...</div>
+
+  <h2>Energy Sources</h2>
+  <div class="btn-group" id="source-list">Loading sources...</div>
+</div>
+
+<div class="stats" id="stats" style="display: none;">
+  <h2 id="stat-title"></h2>
+  <p><strong>Latest Power:</strong> <span id="latest-power"></span> W</p>
+  <p><strong>Latest Time:</strong> <span id="latest-time"></span></p>
+  <p><strong>Average Power:</strong> <span id="average-power"></span> W</p>
+  <p><strong>Peak Power:</strong> <span id="peak-power"></span> W at <span id="peak-time"></span></p>
+</div>
+
+<script>
+async function loadList(endpoint, containerId, callback) {
+  const res = await fetch(endpoint);
+  const items = await res.json();
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  if (items.length === 0) {
+    container.innerHTML = "<p>No entries found.</p>";
+    return;
+  }
+
+  items.forEach(id => {
+    const btn = document.createElement('button');
+    btn.innerText = id;
+    btn.onclick = () => callback(id);
+    container.appendChild(btn);
+  });
+}
+
+async function loadStats(type, id) {
+  const res = await fetch(`/api/${type}/${id}`);
+  const data = await res.json();
+
+  if (data.error) {
+    alert(data.error);
+    return;
+  }
+
+  document.getElementById('stat-title').innerText = `${type === 'device' ? 'Device' : 'Energy Source'}: ${id}`;
+  document.getElementById('latest-power').innerText = data.latest_power;
+  document.getElementById('latest-time').innerText = data.latest_time;
+  document.getElementById('average-power').innerText = data.average_power;
+  document.getElementById('peak-power').innerText = data.peak_power;
+  document.getElementById('peak-time').innerText = data.peak_time;
+
+  document.getElementById('stats').style.display = 'block';
+}
+
+loadList('/api/devices', 'device-list', id => loadStats('device', id));
+loadList('/api/sources', 'source-list', id => loadStats('source', id));
+</script>
+
+</body>
+</html>
+
